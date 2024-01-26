@@ -1,6 +1,7 @@
 # cli-game
 
-## How to play
+A simple command line game.
 
-> [!Tip]
-> This is a simple tip
+### How to play
+
+...
