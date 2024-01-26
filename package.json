@@ -1,0 +1,26 @@
+{
+  "name": "cli-game",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node ."
+  },
+  "bin": {
+    "cli-game": "index.js"
+  },
+  "keywords": [
+    "cli",
+    "game",
+    "terminal"
+  ],
+  "author": "Malte Svensson",
+  "license": "ISC",
+  "dependencies": {
+    "boxen": "^7.1.1",
+    "chalk": "^5.3.0",
+    "figlet": "^1.7.0",
+    "inquirer": "^9.2.12"
+  }
+}
