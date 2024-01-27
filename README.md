@@ -2,6 +2,6 @@
 
 A simple command line game.
 
-## About
+## How to play
 
 ...
