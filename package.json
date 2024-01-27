@@ -1,7 +1,7 @@
 {
   "name": "cli-game",
   "version": "1.0.0",
-  "description": "",
+  "description": "A simple command line game.",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -11,8 +11,8 @@
     "cli-game": "index.js"
   },
   "keywords": [
-    "cli",
     "game",
+    "cli",
     "terminal"
   ],
   "author": "Malte Svensson",
