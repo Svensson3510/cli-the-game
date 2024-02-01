@@ -1,4 +1,4 @@
-# cli-game
+# cli-the-game
 
 A simple command line game.
 
