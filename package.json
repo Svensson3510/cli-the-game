@@ -1,5 +1,5 @@
 {
-  "name": "cli-game",
+  "name": "cli-the-game",
   "version": "1.0.0-beta.0",
   "description": "A simple command line game.",
   "main": "index.js",
@@ -8,7 +8,7 @@
     "start": "node ."
   },
   "bin": {
-    "cli-game": "index.js"
+    "cli-the-game": "index.js"
   },
   "keywords": [
     "game",
