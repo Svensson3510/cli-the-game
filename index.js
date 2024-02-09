@@ -5,20 +5,35 @@ import boxen from 'boxen'
 import chalk from 'chalk'
 import figlet from 'figlet'
 import inquirer from 'inquirer'
+import logUpdate from 'log-update'
+import { GlobalKeyboardListener } from 'node-global-key-listener'
+
+// Keyboard listener
+const kl = new GlobalKeyboardListener()
 
 // Declarations
 const sleep3s = (ms = 3000) => new Promise((r) => setTimeout(r, ms))
+const sleep2s = (ms = 2000) => new Promise((r) => setTimeout(r, ms))
+const sleep500ms = (ms = 500) => new Promise((r) => setTimeout(r, ms))
 const sleep100ms = (ms = 100) => new Promise((r) => setTimeout(r, ms))
+let coinsSleep = (ms = defaultTime - (idleSpeed * 100)) => new Promise((r) => setTimeout(r, ms))
 let name
 let improvement
 let mainMenuAction
-let idleAction
 let fightAction
 let upgradeAction
-let health = 100
-let attack = 100
-let defence = 100
-let speed = 100
+let health = 10
+let attack = 10
+let defence = 10
+let speed = 10
+let coins = 0
+let idl = false
+let manual = false
+let accuireType = 'Auto'
+let cPressed = false
+let defaultTime = 2000
+let idleSpeed = 1
+let idleSpeedUpgradeCost = 50
 
 // Function for printing character name with figlet and logging stats
 async function nameStats() {
@@ -34,11 +49,12 @@ async function nameStats() {
     console.log(`
 Health: ${health}   Attack: ${attack}   Defence: ${defence}   Speed: ${speed}
 
+Idle Speed: ${idleSpeed}   Coins: ${coins}
     `)
 }
 
 // Startup
-figlet('cli-game', (error, data) => {
+figlet('cli-the-game', (error, data) => {
     if (error) {
         console.log('Error!', error)
     }
@@ -77,24 +93,24 @@ async function createCharacter() {
         type: 'list',
         message: `${chalk.yellow('Select improvement')}`,
         choices: [
-            '+10 Health',
-            '+10 Attack',
-            '+10 Defence',
-            '+10 Speed'
+            '+5 Health',
+            '+5 Attack',
+            '+5 Defence',
+            '+5 Speed'
         ]
     })
     improvement = inqImprovement.improvement
-    if (improvement === '+10 Health') {
-        health = 110
+    if (improvement === '+5 Health') {
+        health = 15
     }
-    else if (improvement === '+10 Attack') {
-        attack = 110
+    else if (improvement === '+5 Attack') {
+        attack = 15
     }
-    else if (improvement === '+10 Defence') {
-        defence = 110
+    else if (improvement === '+5 Defence') {
+        defence = 15
     }
-    else if (improvement === '+10 Speed') {
-        speed = 110
+    else if (improvement === '+5 Speed') {
+        speed = 15
     }
     mainMenu()
 }
@@ -128,23 +144,72 @@ async function mainMenu() {
 
 // Idle
 async function idle() {
+    idl = true
     console.clear()
-    await nameStats()
-    const inqIdle = await inquirer.prompt({
-        name: 'idle',
-        type: 'list',
-        message: `${chalk.yellow('Idle')}`,
-        choices: [
-            'Idle',
-            'Back'
-        ]
+    kl.addListener(async function coinSwitch(a) {
+        if (idl === false) {
+            kl.removeListener(coinSwitch)
+        }
+        else if (a.name === "S" && a.state === "DOWN") {
+            if (manual === true) {
+                manual = false
+                await sleep100ms()
+                accuireType = 'Auto'
+            }
+            else if (manual === false) {
+                manual = true
+                await sleep100ms()
+                accuireType = 'Manual'
+            }
+        }
     })
-    idleAction = inqIdle.idle
-    if (idleAction === 'Idle') {
-        console.log('Idling')
-    }
-    else if (idleAction === 'Back') {
-        mainMenu()
+    kl.addListener(async function accuire(b) {
+        if (idl === false) {
+            kl.removeListener(accuire)
+        }
+        else if (b.name === "C" && b.state === "UP" && manual === true && cPressed === true) {
+            cPressed = false
+        }
+        else if (b.name === "C" && b.state === "DOWN" && manual === true && cPressed === false) {
+            coins++
+            cPressed = true
+        }
+    })
+    kl.addListener(async function exit(c) {
+        if (c.name === "E" && c.state === "DOWN") {
+            manual = false
+            accuireType = 'Auto'
+            idl = false
+            kl.removeListener(exit)
+            console.log('Exiting...')
+            await sleep3s()
+            mainMenu()
+        }
+    })
+    while (idl === true) {
+        logUpdate(`
+${boxen(`${coins}`, {title: 'Coins', titleAlignment: 'left', padding: 1, margin: 1})}
+
+    Idle Speed: ${idleSpeed}
+
+    ${accuireType}
+
+    Press S to switch to manually accuire coins by pressing C
+
+    Press S again to switch back to auto
+
+    Press E to exit
+        `)
+        if (idl === false) {
+            null
+        }
+        else if (idl === true && manual === false) {
+            coins++
+            await coinsSleep()
+        }
+        else if (idl === true && manual === true) {
+            await sleep100ms()
+        }
     }
 }
 
@@ -179,13 +244,28 @@ async function upgrade() {
         type: 'list',
         message: `${chalk.yellow('Upgrade')}`,
         choices: [
-            'Upgrade',
+            `Idle Speed, ${idleSpeed === 20 ? '(Fully upgraded)':`${idleSpeedUpgradeCost} Coins`}`,
             'Back'
         ]
     })
     upgradeAction = inqUpgrade.upgrade
-    if (upgradeAction === 'Upgrade') {
-        console.log('Upgrading')
+    if (upgradeAction === `Idle Speed, ${idleSpeed === 20 ? '(Fully upgraded)':`${idleSpeedUpgradeCost} Coins`}`) {
+        if (defaultTime - (idleSpeed * 100) <= 0) {
+            console.log('Fully upgraded!')
+            await sleep2s()
+            upgrade()
+        }
+        else if (coins >= idleSpeedUpgradeCost) {
+            coins = coins - idleSpeedUpgradeCost
+            idleSpeedUpgradeCost = Math.floor(idleSpeedUpgradeCost * 1.2)
+            idleSpeed = idleSpeed + 1
+            upgrade()
+        }
+        else {
+            console.log('Not enough Coins!')
+            await sleep2s()
+            upgrade()
+        }
     }
     else if (upgradeAction === 'Back') {
         mainMenu()
