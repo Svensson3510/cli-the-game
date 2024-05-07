@@ -8,7 +8,7 @@
     "start": "node ./src/main.js"
   },
   "bin": {
-    "cli-the-game": "./src/main.js"
+    "cli-the-game": "src/main.js"
   },
   "keywords": [
     "game",
