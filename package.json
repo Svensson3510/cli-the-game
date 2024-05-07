@@ -1,6 +1,6 @@
 {
   "name": "cli-the-game",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0-beta.3",
   "description": "A simple command line game.",
   "main": "main.js",
   "type": "module",
