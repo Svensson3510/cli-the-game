@@ -2,13 +2,13 @@
   "name": "cli-the-game",
   "version": "1.0.0-beta.2",
   "description": "A simple command line game.",
-  "main": "index.js",
+  "main": "main.js",
   "type": "module",
   "scripts": {
-    "start": "node ."
+    "start": "node ./src/main.js"
   },
   "bin": {
-    "cli-the-game": "index.js"
+    "cli-the-game": "./src/main.js"
   },
   "keywords": [
     "game",
