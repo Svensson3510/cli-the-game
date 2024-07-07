@@ -27,7 +27,7 @@ let attack = 10
 let defence = 10
 let speed = 10
 let coins = 0
-let idle = false
+let idl = false
 let manual = false
 let accuireType = 'Auto'
 let cPressed = false
@@ -144,10 +144,10 @@ async function mainMenu() {
 
 // Idle
 async function idle() {
-    idle = true
+    idl = true
     console.clear()
     kl.addListener(async function coinSwitch(a) {
-        if (idle == false) {
+        if (idl == false) {
             kl.removeListener(coinSwitch)
         }
         else if (a.name == "S" && a.state == "DOWN") {
@@ -164,7 +164,7 @@ async function idle() {
         }
     })
     kl.addListener(async function accuire(b) {
-        if (idle == false) {
+        if (idl == false) {
             kl.removeListener(accuire)
         }
         else if (b.name == "C" && b.state == "UP" && manual == true && cPressed == true) {
@@ -179,14 +179,14 @@ async function idle() {
         if (c.name == "E" && c.state == "DOWN") {
             manual = false
             accuireType = 'Auto'
-            idle = false
+            idl = false
             kl.removeListener(exit)
             console.log('Exiting...')
             await sleep3s()
             mainMenu()
         }
     })
-    while (idle == true) {
+    while (idl == true) {
         logUpdate(`
 ${boxen(`${coins}`, {title: 'Coins', titleAlignment: 'left', padding: 1, margin: 1})}
 
@@ -200,14 +200,14 @@ ${boxen(`${coins}`, {title: 'Coins', titleAlignment: 'left', padding: 1, margin:
 
     Press E to exit
         `)
-        if (idle == false) {
+        if (idl == false) {
             null
         }
-        else if (idle == true && manual == false) {
+        else if (idl == true && manual == false) {
             coins++
             await coinsSleep()
         }
-        else if (idle == true && manual == true) {
+        else if (idl == true && manual == true) {
             await sleep100ms()
         }
     }
