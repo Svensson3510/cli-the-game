@@ -27,7 +27,7 @@ let attack = 10
 let defence = 10
 let speed = 10
 let coins = 0
-let idl = false
+let idle = false
 let manual = false
 let accuireType = 'Auto'
 let cPressed = false
@@ -100,16 +100,16 @@ async function createCharacter() {
         ]
     })
     improvement = inqImprovement.improvement
-    if (improvement === '+5 Health') {
+    if (improvement == '+5 Health') {
         health = 15
     }
-    else if (improvement === '+5 Attack') {
+    else if (improvement == '+5 Attack') {
         attack = 15
     }
-    else if (improvement === '+5 Defence') {
+    else if (improvement == '+5 Defence') {
         defence = 15
     }
-    else if (improvement === '+5 Speed') {
+    else if (improvement == '+5 Speed') {
         speed = 15
     }
     mainMenu()
@@ -131,32 +131,32 @@ async function mainMenu() {
         ]
     })
     mainMenuAction = inqMainMenu.main_menu
-    if (mainMenuAction === 'Idle') {
+    if (mainMenuAction == 'Idle') {
         idle()
     }
-    else if (mainMenuAction === 'Fight') {
+    else if (mainMenuAction == 'Fight') {
         fight()
     }
-    else if (mainMenuAction === 'Upgrade') {
+    else if (mainMenuAction == 'Upgrade') {
         upgrade()
     }
 }
 
 // Idle
 async function idle() {
-    idl = true
+    idle = true
     console.clear()
     kl.addListener(async function coinSwitch(a) {
-        if (idl === false) {
+        if (idle == false) {
             kl.removeListener(coinSwitch)
         }
-        else if (a.name === "S" && a.state === "DOWN") {
-            if (manual === true) {
+        else if (a.name == "S" && a.state == "DOWN") {
+            if (manual == true) {
                 manual = false
                 await sleep100ms()
                 accuireType = 'Auto'
             }
-            else if (manual === false) {
+            else if (manual == false) {
                 manual = true
                 await sleep100ms()
                 accuireType = 'Manual'
@@ -164,29 +164,29 @@ async function idle() {
         }
     })
     kl.addListener(async function accuire(b) {
-        if (idl === false) {
+        if (idle == false) {
             kl.removeListener(accuire)
         }
-        else if (b.name === "C" && b.state === "UP" && manual === true && cPressed === true) {
+        else if (b.name == "C" && b.state == "UP" && manual == true && cPressed == true) {
             cPressed = false
         }
-        else if (b.name === "C" && b.state === "DOWN" && manual === true && cPressed === false) {
+        else if (b.name == "C" && b.state == "DOWN" && manual == true && cPressed == false) {
             coins++
             cPressed = true
         }
     })
     kl.addListener(async function exit(c) {
-        if (c.name === "E" && c.state === "DOWN") {
+        if (c.name == "E" && c.state == "DOWN") {
             manual = false
             accuireType = 'Auto'
-            idl = false
+            idle = false
             kl.removeListener(exit)
             console.log('Exiting...')
             await sleep3s()
             mainMenu()
         }
     })
-    while (idl === true) {
+    while (idle == true) {
         logUpdate(`
 ${boxen(`${coins}`, {title: 'Coins', titleAlignment: 'left', padding: 1, margin: 1})}
 
@@ -200,14 +200,14 @@ ${boxen(`${coins}`, {title: 'Coins', titleAlignment: 'left', padding: 1, margin:
 
     Press E to exit
         `)
-        if (idl === false) {
+        if (idle == false) {
             null
         }
-        else if (idl === true && manual === false) {
+        else if (idle == true && manual == false) {
             coins++
             await coinsSleep()
         }
-        else if (idl === true && manual === true) {
+        else if (idle == true && manual == true) {
             await sleep100ms()
         }
     }
@@ -227,10 +227,10 @@ async function fight() {
         ]
     })
     fightAction = inqFight.fight
-    if (fightAction === 'Fight') {
+    if (fightAction == 'Fight') {
         console.log('Fighting')
     }
-    else if (fightAction === 'Back') {
+    else if (fightAction == 'Back') {
         mainMenu()
     }
 }
@@ -244,12 +244,12 @@ async function upgrade() {
         type: 'list',
         message: `${chalk.yellow('Upgrade')}`,
         choices: [
-            `Idle Speed, ${idleSpeed === 20 ? '(Fully upgraded)':`${idleSpeedUpgradeCost} Coins`}`,
+            `Idle Speed, ${idleSpeed == 20 ? '(Fully upgraded)':`${idleSpeedUpgradeCost} Coins`}`,
             'Back'
         ]
     })
     upgradeAction = inqUpgrade.upgrade
-    if (upgradeAction === `Idle Speed, ${idleSpeed === 20 ? '(Fully upgraded)':`${idleSpeedUpgradeCost} Coins`}`) {
+    if (upgradeAction == `Idle Speed, ${idleSpeed == 20 ? '(Fully upgraded)':`${idleSpeedUpgradeCost} Coins`}`) {
         if (defaultTime - (idleSpeed * 100) <= 0) {
             console.log('Fully upgraded!')
             await sleep2s()
@@ -267,7 +267,7 @@ async function upgrade() {
             upgrade()
         }
     }
-    else if (upgradeAction === 'Back') {
+    else if (upgradeAction == 'Back') {
         mainMenu()
     }
 }
