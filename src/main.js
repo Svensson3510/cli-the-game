@@ -7,6 +7,7 @@ import figlet from 'figlet'
 import inquirer from 'inquirer'
 import logUpdate from 'log-update'
 import { GlobalKeyboardListener } from 'node-global-key-listener'
+import fs from 'fs'
 
 // Keyboard listener
 const kl = new GlobalKeyboardListener()
@@ -16,24 +17,32 @@ const sleep3s = (ms = 3000) => new Promise((r) => setTimeout(r, ms))
 const sleep2s = (ms = 2000) => new Promise((r) => setTimeout(r, ms))
 const sleep500ms = (ms = 500) => new Promise((r) => setTimeout(r, ms))
 const sleep100ms = (ms = 100) => new Promise((r) => setTimeout(r, ms))
-let coinsSleep = (ms = defaultTime - (idleSpeed * 100)) => new Promise((r) => setTimeout(r, ms))
+let coinsSleep = (ms = (8/idleSpeed) * 100) => new Promise((r) => setTimeout(r, ms))
 let name
 let improvement
 let mainMenuAction
 let fightAction
+let spearmenAction
 let upgradeAction
 let health = 10
 let attack = 10
 let defence = 10
 let speed = 10
-let coins = 0
+let coins = 1000000
 let idl = false
 let manual = false
 let accuireType = 'Auto'
 let cPressed = false
-let defaultTime = 2000
 let idleSpeed = 1
 let idleSpeedUpgradeCost = 50
+
+// Enemies
+let spearmenStats = JSON.parse(fs.readFileSync('./enemies/spearmen.json', 'utf-8'))
+
+async function showEnemyStats(x) {
+    let enemyStats = Object.entries(x).map(([a, b]) => {return ` ${a}: ${b}`})
+    return enemyStats
+} 
 
 // Function for printing character name with figlet and logging stats
 async function nameStats() {
@@ -182,7 +191,7 @@ async function idle() {
             idl = false
             kl.removeListener(exit)
             console.log('Exiting...')
-            await sleep3s()
+            await sleep500ms()
             mainMenu()
         }
     })
@@ -192,11 +201,9 @@ ${boxen(`${coins}`, {title: 'Coins', titleAlignment: 'left', padding: 1, margin:
 
     Idle Speed: ${idleSpeed}
 
-    ${accuireType}
+    ${accuireType} ${manual == true ? '(press C)':''}
 
-    Press S to switch to manually accuire coins by pressing C
-
-    Press S again to switch back to auto
+    Press S to switch between Manual and Auto
 
     Press E to exit
         `)
@@ -222,16 +229,41 @@ async function fight() {
         type: 'list',
         message: `${chalk.yellow('Fight')}`,
         choices: [
-            'Fight',
+            'Spearmen',
             'Back'
         ]
     })
     fightAction = inqFight.fight
-    if (fightAction == 'Fight') {
-        console.log('Fighting')
+    if (fightAction == 'Spearmen') {
+        spearmen()
     }
     else if (fightAction == 'Back') {
         mainMenu()
+    }
+}
+
+// Spearmen
+async function spearmen() {
+    console.clear()
+    await nameStats()
+    const inqSpearmen = await inquirer.prompt({
+        name: 'spearmen',
+        type: 'list',
+        message: `${chalk.yellow('Spearmen', await showEnemyStats(spearmenStats))}`,
+        choices: [
+            'Attack',
+            'Back'
+        ]
+    })
+    spearmenAction = inqSpearmen.spearmen
+    if (spearmenAction == 'Attack') {
+        console.log('Attacking')
+        spearmenStats.Health = spearmenStats.Health - 1
+        await sleep500ms()
+        spearmen()
+    }
+    else if (spearmenAction == 'Back') {
+        fight()
     }
 }
 
@@ -250,7 +282,7 @@ async function upgrade() {
     })
     upgradeAction = inqUpgrade.upgrade
     if (upgradeAction == `Idle Speed, ${idleSpeed == 20 ? '(Fully upgraded)':`${idleSpeedUpgradeCost} Coins`}`) {
-        if (defaultTime - (idleSpeed * 100) <= 0) {
+        if (idleSpeed == 20) {
             console.log('Fully upgraded!')
             await sleep2s()
             upgrade()
