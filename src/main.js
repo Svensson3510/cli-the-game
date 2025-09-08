@@ -17,6 +17,7 @@ const sleep3s = (ms = 3000) => new Promise((r) => setTimeout(r, ms))
 const sleep2s = (ms = 2000) => new Promise((r) => setTimeout(r, ms))
 const sleep500ms = (ms = 500) => new Promise((r) => setTimeout(r, ms))
 const sleep100ms = (ms = 100) => new Promise((r) => setTimeout(r, ms))
+const sleep = (ms = 100) => new Promise((r) => setTimeout(r, ms))
 let coinsSleep = (ms = (8/idleSpeed) * 100) => new Promise((r) => setTimeout(r, ms))
 let name
 let improvement
