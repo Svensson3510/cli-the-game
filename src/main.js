@@ -10,15 +10,11 @@ import { GlobalKeyboardListener } from 'node-global-key-listener'
 import fs from 'fs'
 
 // Keyboard listener
-const kl = new GlobalKeyboardListener()
+const KL = new GlobalKeyboardListener()
 
 // Declarations
-const sleep3s = (ms = 3000) => new Promise((r) => setTimeout(r, ms))
-const sleep2s = (ms = 2000) => new Promise((r) => setTimeout(r, ms))
-const sleep500ms = (ms = 500) => new Promise((r) => setTimeout(r, ms))
-const sleep100ms = (ms = 100) => new Promise((r) => setTimeout(r, ms))
-const sleep = (ms = 100) => new Promise((r) => setTimeout(r, ms))
-let coinsSleep = (ms = (8/idleSpeed) * 100) => new Promise((r) => setTimeout(r, ms))
+let Sleep = (ms) => new Promise((r) => setTimeout(r, ms))
+let CoinsSleep = (ms = (8/idleSpeed) * 100) => new Promise((r) => setTimeout(r, ms))
 let name
 let improvement
 let mainMenuAction
@@ -30,7 +26,7 @@ let attack = 10
 let defence = 10
 let speed = 10
 let coins = 1000000
-let idl = false
+let idle = false
 let manual = false
 let accuireType = 'Auto'
 let cPressed = false
@@ -40,13 +36,13 @@ let idleSpeedUpgradeCost = 50
 // Enemies
 let spearmenStats = JSON.parse(fs.readFileSync('./enemies/spearmen.json', 'utf-8'))
 
-async function showEnemyStats(x) {
+async function ShowEnemyStats(x) {
     let enemyStats = Object.entries(x).map(([a, b]) => {return ` ${a}: ${b}`})
     return enemyStats
 } 
 
 // Function for printing character name with figlet and logging stats
-async function nameStats() {
+async function NameStats() {
     figlet(name, (error, data) => {
         if (error) {
             console.log('Error!', error)
@@ -55,7 +51,7 @@ async function nameStats() {
             console.log(data)
         }
     })
-    await sleep100ms()
+    await Sleep(100)
     console.log(`
 Health: ${health}   Attack: ${attack}   Defence: ${defence}   Speed: ${speed}
 
@@ -72,10 +68,10 @@ figlet('cli-the-game', (error, data) => {
         console.log(data)
     }
 })
-await sleep3s()
+await Sleep(3000)
 
 // Create character
-async function createCharacter() {
+async function CreateCharacter() {
     console.clear()
     figlet('Create character', (error, data) => {
         if (error) {
@@ -85,7 +81,7 @@ async function createCharacter() {
             console.log(data)
         }
     })
-    await sleep100ms()
+    await Sleep(100)
     const inqName = await inquirer.prompt({
         name: 'name',
         type: 'input',
@@ -96,8 +92,8 @@ async function createCharacter() {
     })
     name = inqName.name
     console.clear()
-    nameStats()
-    await sleep100ms()
+    NameStats()
+    await Sleep(100)
     const inqImprovement = await inquirer.prompt({
         name: 'improvement',
         type: 'list',
@@ -122,14 +118,14 @@ async function createCharacter() {
     else if (improvement == '+5 Speed') {
         speed = 15
     }
-    mainMenu()
+    MainMenu()
 }
-createCharacter()
+CreateCharacter()
 
 // Main menu
-async function mainMenu() {
+async function MainMenu() {
     console.clear()
-    await nameStats()
+    await NameStats()
     const inqMainMenu = await inquirer.prompt({
         name: 'main_menu',
         type: 'list',
@@ -142,40 +138,40 @@ async function mainMenu() {
     })
     mainMenuAction = inqMainMenu.main_menu
     if (mainMenuAction == 'Idle') {
-        idle()
+        Idle()
     }
     else if (mainMenuAction == 'Fight') {
-        fight()
+        Fight()
     }
     else if (mainMenuAction == 'Upgrade') {
-        upgrade()
+        Upgrade()
     }
 }
 
 // Idle
-async function idle() {
-    idl = true
+async function Idle() {
+    idle = true
     console.clear()
-    kl.addListener(async function coinSwitch(a) {
-        if (idl == false) {
-            kl.removeListener(coinSwitch)
+    KL.addListener(async function CoinSwitch(a) {
+        if (idle == false) {
+            KL.removeListener(CoinSwitch)
         }
         else if (a.name == "S" && a.state == "DOWN") {
             if (manual == true) {
                 manual = false
-                await sleep100ms()
+                await Sleep(100)
                 accuireType = 'Auto'
             }
             else if (manual == false) {
                 manual = true
-                await sleep100ms()
+                await Sleep(100)
                 accuireType = 'Manual'
             }
         }
     })
-    kl.addListener(async function accuire(b) {
-        if (idl == false) {
-            kl.removeListener(accuire)
+    KL.addListener(async function Accuire(b) {
+        if (idle == false) {
+            KL.removeListener(Accuire)
         }
         else if (b.name == "C" && b.state == "UP" && manual == true && cPressed == true) {
             cPressed = false
@@ -185,18 +181,18 @@ async function idle() {
             cPressed = true
         }
     })
-    kl.addListener(async function exit(c) {
+    KL.addListener(async function Exit(c) {
         if (c.name == "E" && c.state == "DOWN") {
             manual = false
             accuireType = 'Auto'
-            idl = false
-            kl.removeListener(exit)
+            idle = false
+            KL.removeListener(Exit)
             console.log('Exiting...')
-            await sleep500ms()
-            mainMenu()
+            await Sleep(500)
+            MainMenu()
         }
     })
-    while (idl == true) {
+    while (idle == true) {
         logUpdate(`
 ${boxen(`${coins}`, {title: 'Coins', titleAlignment: 'left', padding: 1, margin: 1})}
 
@@ -208,23 +204,23 @@ ${boxen(`${coins}`, {title: 'Coins', titleAlignment: 'left', padding: 1, margin:
 
     Press E to exit
         `)
-        if (idl == false) {
+        if (idle == false) {
             null
         }
-        else if (idl == true && manual == false) {
+        else if (idle == true && manual == false) {
             coins++
-            await coinsSleep()
+            await CoinsSleep()
         }
-        else if (idl == true && manual == true) {
-            await sleep100ms()
+        else if (idle == true && manual == true) {
+            await Sleep(100)
         }
     }
 }
 
 // Fight
-async function fight() {
+async function Fight() {
     console.clear()
-    await nameStats()
+    await NameStats()
     const inqFight = await inquirer.prompt({
         name: 'fight',
         type: 'list',
@@ -236,21 +232,21 @@ async function fight() {
     })
     fightAction = inqFight.fight
     if (fightAction == 'Spearmen') {
-        spearmen()
+        Spearmen()
     }
     else if (fightAction == 'Back') {
-        mainMenu()
+        MainMenu()
     }
 }
 
 // Spearmen
-async function spearmen() {
+async function Spearmen() {
     console.clear()
-    await nameStats()
+    await NameStats()
     const inqSpearmen = await inquirer.prompt({
         name: 'spearmen',
         type: 'list',
-        message: `${chalk.yellow('Spearmen', await showEnemyStats(spearmenStats))}`,
+        message: `${chalk.yellow('Spearmen', await ShowEnemyStats(spearmenStats))}`,
         choices: [
             'Attack',
             'Back'
@@ -260,18 +256,18 @@ async function spearmen() {
     if (spearmenAction == 'Attack') {
         console.log('Attacking')
         spearmenStats.Health = spearmenStats.Health - 1
-        await sleep500ms()
-        spearmen()
+        await Sleep(500)
+        Spearmen()
     }
     else if (spearmenAction == 'Back') {
-        fight()
+        Fight()
     }
 }
 
 // Upgrade
-async function upgrade() {
+async function Upgrade() {
     console.clear()
-    await nameStats()
+    await NameStats()
     const inqUpgrade = await inquirer.prompt({
         name: 'upgrade',
         type: 'list',
@@ -285,22 +281,22 @@ async function upgrade() {
     if (upgradeAction == `Idle Speed, ${idleSpeed == 20 ? '(Fully upgraded)':`${idleSpeedUpgradeCost} Coins`}`) {
         if (idleSpeed == 20) {
             console.log('Fully upgraded!')
-            await sleep2s()
-            upgrade()
+            await Sleep(2000)
+            Upgrade()
         }
         else if (coins >= idleSpeedUpgradeCost) {
             coins = coins - idleSpeedUpgradeCost
             idleSpeedUpgradeCost = Math.floor(idleSpeedUpgradeCost * 1.2)
             idleSpeed = idleSpeed + 1
-            upgrade()
+            Upgrade()
         }
         else {
             console.log('Not enough Coins!')
-            await sleep2s()
-            upgrade()
+            await Sleep(2000)
+            Upgrade()
         }
     }
     else if (upgradeAction == 'Back') {
-        mainMenu()
+        MainMenu()
     }
 }
